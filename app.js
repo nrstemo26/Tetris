@@ -11,7 +11,7 @@ let totalTetrominosPlayed = 0;
 let level = 1;
 let dropSpeed = 1000;
 
-
+console.log('ghdlfj');
 
 //this is the straight tetromino
 const sTetromino = [
