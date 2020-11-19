@@ -9,7 +9,7 @@ const width = 10;
 let score = 0;
 let totalTetrominosPlayed = 0;
 let level = 1;
-let dropSpeed = 10000;
+let dropSpeed = 1000;
 
 
 
@@ -157,7 +157,7 @@ function checkHit(){
 
 document.addEventListener('keydown', event =>{
     if(event.code === "KeyZ"){
-        //find index of current rotation
+        //finds which rotation the current tetromino
         let currentRotation = allTetrominoes[random].findIndex((element, index) =>{
             for(let i =0; i<element.length; i++){
               //  console.log(`${element[i]} is being compared to ${current[i]}`);
@@ -171,16 +171,6 @@ document.addEventListener('keydown', event =>{
         let nextRotation = allTetrominoes[random][(currentRotation + 1) % 4]
         let currentWidth =[...new Set(current.map(x => x % width))].length;
         let nextWidth = [...new Set(nextRotation.map(x => x % width))].length;
-        
-        
-    //     console.log(`The current 0 position is: ${currentPosition +currentWidth + (nextWidth - currentWidth)}`);
-    //     console.log(`The end of row width is: ${(Math.floor(currentPosition/width) * width )+ 9}`);
-        
-    //    console.log(nextRotation);
-    //    console.log(currentWidth);
-    //    console.log(nextWidth);
-    //    console.log(nextWidth - currentWidth);
-
     
         if(canRotate(nextRotation)){
             undraw();
@@ -191,16 +181,21 @@ document.addEventListener('keydown', event =>{
     if(event.code === "ArrowRight"){
         let currentWidth = [...new Set(current.map(x => x % width))].length;
         if((currentPosition % width) + currentWidth - 1 !== 9){
-          undraw();
-          currentPosition += 1;
-          draw();
+            if(checkForLegalLateralMove("right")){
+               undraw();
+               currentPosition += 1;
+               draw();
+            }
         }
     }
     if(event.code === "ArrowLeft"){
         if(currentPosition % width !== 0){
-            undraw();
-            currentPosition -= 1;
-            draw();
+            if(checkForLegalLateralMove("left")){
+                undraw();
+                currentPosition -= 1;
+                draw();
+            }
+            
         }
         
     }
@@ -227,6 +222,25 @@ function canRotate(nextRotation){
          return false;
     }
      return true;   
+}
+
+//this is super similar to check hit other piece
+function checkForLegalLateralMove(direction){
+    //finds the actual spot of the tetromino
+     let actualSpot = current.map(x=> x + currentPosition);
+     //finds the spot of the tetromino if it moves forward or backwards one square
+     let futureSpot = actualSpot.map(x=> x+1);
+    if(direction === "left"){
+        futureSpot = actualSpot.map(x=> x-1);
+    }
+ 
+  //i need to find if the future spot has the classname of block at any spot.
+  for(let i =0; i<futureSpot.length; i++){
+      if(squares[futureSpot[i]].className === "block"){
+          return false;
+      }
+  }
+  return true;
 }
 
 function isValidMove(){
