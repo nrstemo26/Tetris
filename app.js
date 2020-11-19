@@ -9,9 +9,9 @@ const width = 10;
 let score = 0;
 let totalTetrominosPlayed = 0;
 let level = 1;
-let dropSpeed = 1000;
+let dropSpeed = 10000;
 
-console.log('ghdlfj');
+
 
 //this is the straight tetromino
 const sTetromino = [
@@ -62,13 +62,13 @@ let currentPosition = 5;
 //picks random tetromino
 let random = Math.floor(Math.random()*allTetrominoes.length);
 let current = allTetrominoes[random][0];
+console.log(current);
 
 
 function createNewPiece(){
     currentPosition = 5;
     random = Math.floor(Math.random()*allTetrominoes.length);
     current = allTetrominoes[random][0];
-  
 }
 
 
@@ -171,19 +171,22 @@ document.addEventListener('keydown', event =>{
         let nextRotation = allTetrominoes[random][(currentRotation + 1) % 4]
         let currentWidth =[...new Set(current.map(x => x % width))].length;
         let nextWidth = [...new Set(nextRotation.map(x => x % width))].length;
-        console.log(`The current 0 position is: ${currentPosition +currentWidth + (nextWidth - currentWidth)}`);
-        console.log(`The end of row width is: ${(Math.floor(currentPosition/width) * width )+ 9}`);
         
-       console.log(nextRotation);
-       console.log(currentWidth);
-       console.log(nextWidth);
-       console.log(nextWidth - currentWidth);
+        
+    //     console.log(`The current 0 position is: ${currentPosition +currentWidth + (nextWidth - currentWidth)}`);
+    //     console.log(`The end of row width is: ${(Math.floor(currentPosition/width) * width )+ 9}`);
+        
+    //    console.log(nextRotation);
+    //    console.log(currentWidth);
+    //    console.log(nextWidth);
+    //    console.log(nextWidth - currentWidth);
 
-       
-        undraw();
-        
-        current = allTetrominoes[random][(currentRotation + 1) % 4];
-        draw();
+    
+        if(canRotate(nextRotation)){
+            undraw();
+            current = allTetrominoes[random][(currentRotation + 1) % 4];
+            draw();
+        }
     }
     if(event.code === "ArrowRight"){
         let currentWidth = [...new Set(current.map(x => x % width))].length;
@@ -213,6 +216,18 @@ document.addEventListener('keydown', event =>{
         draw();
     }
 });
+
+function canRotate(nextRotation){
+    let currentPositionArray = current.map(x=> (x + currentPosition) % 10);
+    let actualNextRotation = nextRotation.map(x => (x + currentPosition) % 10);
+  
+
+    if(actualNextRotation.filter(x => x < 3).length > 0
+       && currentPositionArray.filter(x => x > 5 ).length > 0 ){
+         return false;
+    }
+     return true;   
+}
 
 function isValidMove(){
     //it should be all of the moves minus their width to find if they would go out of bounds
