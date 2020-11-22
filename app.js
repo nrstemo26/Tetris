@@ -10,6 +10,7 @@ let score = 0;
 let totalTetrominosPlayed = 0;
 let level = 1;
 let dropSpeed = 1000;
+let timerId = setInterval(moveDown, dropSpeed);
 
 
 
@@ -57,8 +58,7 @@ const zTetromino = [
 
 const allTetrominoes = [sTetromino, oTetromino, tTetromino, lTetromino, zTetromino];
 
-
-let currentPosition = 5;
+let currentPosition = 175;
 //picks random tetromino
 let random = Math.floor(Math.random()*allTetrominoes.length);
 let current = allTetrominoes[random][0];
@@ -94,19 +94,12 @@ function undraw(){
 
 draw();
 
-//make the tetromino move down every second
-timerId = setInterval(moveDown, dropSpeed);
-
 //move down function
 function moveDown(){
     if(!checkHit()){
-        undraw();
-        currentPosition += width;
-        draw();
+        movePiece(width);
     }else{
-        console.log(totalTetrominosPlayed);
         checkForScore();
-        createNewPiece();
         totalTetrominosPlayed++;
         if(totalTetrominosPlayed === 15){
             dropSpeed = dropSpeed * (7/10);
@@ -114,12 +107,9 @@ function moveDown(){
             level++;
             levelDisplay.innerHTML = level;
         }
-        
-        draw();
-        timerId = setInterval(moveDown, dropSpeed);
-
     }
 }
+
 
 
 function checkHitOtherPiece(){
@@ -127,32 +117,58 @@ function checkHitOtherPiece(){
     let actualSpot = current.map(x=> x + currentPosition);
    //finds the spot of the tetromino if it falls one row
     let futureSpot = actualSpot.map(x=> x + width);
+    console.log(actualSpot);
+    console.log(futureSpot);
+    for(let i = 0; i<4; i++){
+        console.log(squares[futureSpot[i]]);
+    }
+   
    
     //i need to find if the future spot has the classname of block at any spot.
     for(let i =0; i<futureSpot.length; i++){
-        if(squares[futureSpot[i]].className === "block"){
-            return true;
+        if(squares[futureSpot[i]]){
+          if(squares[futureSpot[i]].className === "block"){
+             return true;
+          }
         }
     }
 }
+function checkHitBottom(){   
+    //finds the actual spot of the tetromino
+    let actualSpot = current.map(x => x + currentPosition);
+    
+    let futureSpot = actualSpot.map(x=> x + width);
+     //i need to find if the future spot has the classname of block at any spot.
+     for(let i =0; i< actualSpot.length; i++){
+         console.log(squares[actualSpot[i]].className === "end")
+         if(squares[futureSpot[i]].className === "end"){
+             return true;
+         }
+     }
+}
 
+function restartTimer(){
+    timerId = setInterval(moveDown, dropSpeed);
+}
+
+//potentially refactor this so that it just checks for hit and
+//then 
 function checkHit(){
     //checks for hitting the bottom row
-    if(currentPosition + width > 190){
+    //debugger;
+    if(currentPosition + width > 190 || checkHitBottom() || checkHitOtherPiece()){
         undraw();
         clearInterval(timerId);
         stickPiece();
+        checkForScore();
+        createNewPiece();
+        draw();
+        restartTimer();
         return true;
-    }
-    //checks for hitting other pieces
-    if(checkHitOtherPiece()){
-        undraw();
-        clearInterval(timerId);
-        stickPiece();
-        return true;
-    }
-        
+    }        
 }
+
+
 
 
 document.addEventListener('keydown', event =>{
@@ -182,44 +198,53 @@ document.addEventListener('keydown', event =>{
         let currentWidth = [...new Set(current.map(x => x % width))].length;
         if((currentPosition % width) + currentWidth - 1 !== 9){
             if(checkForLegalLateralMove("right")){
-               undraw();
-               currentPosition += 1;
-               draw();
+                movePiece(1);
             }
         }
     }
     if(event.code === "ArrowLeft"){
         if(currentPosition % width !== 0){
             if(checkForLegalLateralMove("left")){
-                undraw();
-                currentPosition -= 1;
-                draw();
+                movePiece(-1);
             }
             
         }
-        
     }
+
     if(event.code === "ArrowUp"){
-        undraw();
-        currentPosition -= width;
-        draw();
+       movePiece(-width);
     }
+
     if(event.code === "ArrowDown"){
-        checkHit();
-        undraw();
-        currentPosition += width;
-        draw();
+       if(!checkHit()){
+           movePiece(width);
+       }
     }
 });
+
+
+function movePiece(increment){
+    undraw();
+    currentPosition = currentPosition + increment;
+    draw();
+}
 
 function canRotate(nextRotation){
     let currentPositionArray = current.map(x=> (x + currentPosition) % 10);
     let actualNextRotation = nextRotation.map(x => (x + currentPosition) % 10);
   
+    let actualSpot = current.map(x=> x + currentPosition);
+    let futureSpot = nextRotation.map(x => x + currentPosition);
+   
 
     if(actualNextRotation.filter(x => x < 3).length > 0
-       && currentPositionArray.filter(x => x > 5 ).length > 0 ){
+    && currentPositionArray.filter(x => x > 5 ).length > 0 ){
          return false;
+    }
+    for(let i =0; i<futureSpot.length; i++){
+        if(squares[futureSpot[i]].className === "block"){
+            return false;
+        }
     }
      return true;   
 }
@@ -243,19 +268,6 @@ function checkForLegalLateralMove(direction){
   return true;
 }
 
-function isValidMove(){
-    //it should be all of the moves minus their width to find if they would go out of bounds
-   // console.log(current);
-    currentCheck = current.map(x=> x % 10);
-    console.log(`The adjusted current ${currentCheck}`);
-    for(let i = 0; i<current.length; i++){
-        console.log(`The sum of these two are ${currentCheck[i]+ currentPosition}`);
-
-        if((currentCheck[i] + currentPosition) > 9){
-            console.log('not a valid move');
-        }
-    }
-}
 
 
 function checkForScore(){
@@ -276,18 +288,12 @@ function checkForScore(){
     }
 }
 
-
 // find where all of the blocks are on the squares array then map thru and add 10 to every 'block'
 function removeRow(row){
     for(let i = 0; i<width; i++){
         squares[row*width + i].classList.remove('block');
     }
 }
-
-
-//This currently only finds where all of the block class spots are
-//I have yet to move the pieces down
-
 
 function adjustBlockRows(row){
     let indexArray = [];
@@ -321,14 +327,3 @@ function adjustBlockRows(row){
     });
       
 }
-
-
-
-//stuff to do for this app still
-    //have a check for scoring and then remove the line that was made
-    //have a spot off screen for the next piece
-
-    //make there be levels?... should be easy. simply make the timer intervals move up over time. maybe remove a data point
-    // for their next piece. 
-
-
