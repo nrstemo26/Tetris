@@ -1,5 +1,9 @@
 const grid = document.querySelector('.grid');
 let squares = Array.from(document.querySelectorAll('.grid div'));
+
+const nextPieceGrid = document.querySelector('.nextPieceGrid');
+let nextPieceSquares = Array.from(document.querySelectorAll('.nextPieceGrid div'));
+
 const ScoreDisplay = document.querySelector('#score');
 const StartBtn = document.querySelector('#start-button');
 const levelDisplay = document.querySelector('#level');
@@ -58,24 +62,34 @@ const zTetromino = [
 
 const allTetrominoes = [sTetromino, oTetromino, tTetromino, lTetromino, zTetromino];
 
-let currentPosition = 175;
-//picks random tetromino
+let currentPosition = 5;
 let random = Math.floor(Math.random()*allTetrominoes.length);
 let current = allTetrominoes[random][0];
-console.log(current);
+let randomNext = Math.floor(Math.random()*allTetrominoes.length);
+let nextPiece = allTetrominoes[randomNext][0];
 
 
 function createNewPiece(){
     currentPosition = 5;
-    random = Math.floor(Math.random()*allTetrominoes.length);
-    current = allTetrominoes[random][0];
+    current = nextPiece;
+    random = randomNext;
+    randomNext = Math.floor(Math.random()*allTetrominoes.length);
+    nextPiece = allTetrominoes[randomNext][0];
 }
-
-
 
 function draw(){
     current.forEach(index =>{
         squares[currentPosition + index].classList.add('tetromino');
+    });
+}
+function drawNextPiece(){
+    nextPiece.forEach(index =>{
+        nextPieceSquares[index].classList.add('next');
+    });
+}
+function undrawNextPiece(){
+    nextPiece.forEach(index => {
+        nextPieceSquares[index].classList.remove('next');
     });
 }
 
@@ -85,7 +99,6 @@ function stickPiece(){
     });
 }
 
-//remove the tetrominoes as it moves down the board
 function undraw(){
     current.forEach(index => {
         squares[currentPosition + index].classList.remove('tetromino');
@@ -93,6 +106,8 @@ function undraw(){
 }
 
 draw();
+drawNextPiece();
+
 
 //move down function
 function moveDown(){
@@ -111,37 +126,14 @@ function moveDown(){
 }
 
 
-
-function checkHitOtherPiece(){
-    //finds the actual spot of the tetromino
-    let actualSpot = current.map(x=> x + currentPosition);
-   //finds the spot of the tetromino if it falls one row
-    let futureSpot = actualSpot.map(x=> x + width);
-    console.log(actualSpot);
-    console.log(futureSpot);
-    for(let i = 0; i<4; i++){
-        console.log(squares[futureSpot[i]]);
-    }
-   
-   
-    //i need to find if the future spot has the classname of block at any spot.
-    for(let i =0; i<futureSpot.length; i++){
-        if(squares[futureSpot[i]]){
-          if(squares[futureSpot[i]].className === "block"){
-             return true;
-          }
-        }
-    }
-}
-function checkHitBottom(){   
+function checkHitPiece(input){   
     //finds the actual spot of the tetromino
     let actualSpot = current.map(x => x + currentPosition);
     
     let futureSpot = actualSpot.map(x=> x + width);
-     //i need to find if the future spot has the classname of block at any spot.
-     for(let i =0; i< actualSpot.length; i++){
-         console.log(squares[actualSpot[i]].className === "end")
-         if(squares[futureSpot[i]].className === "end"){
+    //i need to find if the future spot has the classname of block at any spot.
+    for(let i =0; i< actualSpot.length; i++){
+             if(squares[futureSpot[i]].className === input){
              return true;
          }
      }
@@ -154,21 +146,19 @@ function restartTimer(){
 //potentially refactor this so that it just checks for hit and
 //then 
 function checkHit(){
-    //checks for hitting the bottom row
-    //debugger;
-    if(currentPosition + width > 190 || checkHitBottom() || checkHitOtherPiece()){
+     if(currentPosition + width > 190 || checkHitPiece("end") || checkHitPiece("block")){
         undraw();
+        undrawNextPiece();
         clearInterval(timerId);
         stickPiece();
         checkForScore();
         createNewPiece();
         draw();
+        drawNextPiece();
         restartTimer();
         return true;
     }        
 }
-
-
 
 
 document.addEventListener('keydown', event =>{
@@ -183,6 +173,7 @@ document.addEventListener('keydown', event =>{
             }
             return true;
         });
+        console.log(currentRotation);
         
         let nextRotation = allTetrominoes[random][(currentRotation + 1) % 4]
         let currentWidth =[...new Set(current.map(x => x % width))].length;
@@ -269,7 +260,6 @@ function checkForLegalLateralMove(direction){
 }
 
 
-
 function checkForScore(){
     let total;
     for(let i = 0; i < squares.length/width; i++){
@@ -326,4 +316,8 @@ function adjustBlockRows(row){
           squares[index].classList.add('block');
     });
       
+}
+
+function endGame(){
+
 }

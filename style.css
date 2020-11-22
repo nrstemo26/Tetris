@@ -1,12 +1,22 @@
-.grid {
+.grid{
     width: 200px;
     height: 400px;
     display: flex;
     flex-wrap: wrap;
     background-color: yellow;
 }
+.nextPieceGrid{
+    width: 200px;
+    height: 80px;
+    display: flex;
+    flex-wrap: wrap;
+}
 
 .grid div{
+    height: 20px;
+    width: 20px;
+}
+.nextPieceGrid div{
     height: 20px;
     width: 20px;
 }
@@ -20,4 +30,7 @@
 }
 .end{
     background-color: grey;
+}
+.next{
+    background-color:orange;
 }
