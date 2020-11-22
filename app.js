@@ -6,6 +6,7 @@ let nextPieceSquares = Array.from(document.querySelectorAll('.nextPieceGrid div'
 
 const ScoreDisplay = document.querySelector('#score');
 const StartBtn = document.querySelector('#start-button');
+const StoptBtn = document.querySelector('#stop-button');
 const levelDisplay = document.querySelector('#level');
 
 
@@ -73,8 +74,15 @@ function createNewPiece(){
     currentPosition = 5;
     current = nextPiece;
     random = randomNext;
-    randomNext = Math.floor(Math.random()*allTetrominoes.length);
-    nextPiece = allTetrominoes[randomNext][0];
+    if(checkHitOnCreate()){
+        endGame();
+        return false;
+    }else{
+        randomNext = Math.floor(Math.random()*allTetrominoes.length);
+        nextPiece = allTetrominoes[randomNext][0];
+    }
+    return true;
+    
 }
 
 function draw(){
@@ -124,6 +132,17 @@ function moveDown(){
         }
     }
 }
+function checkHitOnCreate(){
+   // debugger;
+    let actualSpot = current.map(x => x + currentPosition);
+
+    for(let i =0; i< actualSpot.length; i++){
+        if(squares[actualSpot[i]].className === "block"){
+        return true;
+        }
+    }
+    return false;
+}
 
 
 function checkHitPiece(input){   
@@ -146,22 +165,24 @@ function restartTimer(){
 //potentially refactor this so that it just checks for hit and
 //then 
 function checkHit(){
-     if(currentPosition + width > 190 || checkHitPiece("end") || checkHitPiece("block")){
+    if(currentPosition + width > 190 || checkHitPiece("end") || checkHitPiece("block")){
         undraw();
         undrawNextPiece();
         clearInterval(timerId);
         stickPiece();
         checkForScore();
-        createNewPiece();
-        draw();
-        drawNextPiece();
-        restartTimer();
-        return true;
+        if(createNewPiece()){
+            draw();
+            drawNextPiece();
+            restartTimer();
+            return true;
+        }
     }        
 }
 
+document.addEventListener('keydown', movementKeys);
 
-document.addEventListener('keydown', event =>{
+function movementKeys(event){
     if(event.code === "KeyZ"){
         //finds which rotation the current tetromino
         let currentRotation = allTetrominoes[random].findIndex((element, index) =>{
@@ -173,7 +194,6 @@ document.addEventListener('keydown', event =>{
             }
             return true;
         });
-        console.log(currentRotation);
         
         let nextRotation = allTetrominoes[random][(currentRotation + 1) % 4]
         let currentWidth =[...new Set(current.map(x => x % width))].length;
@@ -211,7 +231,7 @@ document.addEventListener('keydown', event =>{
            movePiece(width);
        }
     }
-});
+}
 
 
 function movePiece(increment){
@@ -318,6 +338,10 @@ function adjustBlockRows(row){
       
 }
 
-function endGame(){
 
+function endGame(){
+    alert('You have lost!');
+    clearInterval(timerId);
+    undraw();
+    document.removeEventListener('keydown', movementKeys);
 }
