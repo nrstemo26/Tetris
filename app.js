@@ -92,12 +92,12 @@ function draw(){
 }
 function drawNextPiece(){
     nextPiece.forEach(index =>{
-        nextPieceSquares[index].classList.add('next');
+        nextPieceSquares[index + 2].classList.add('next');
     });
 }
 function undrawNextPiece(){
     nextPiece.forEach(index => {
-        nextPieceSquares[index].classList.remove('next');
+        nextPieceSquares[index + 2].classList.remove('next');
     });
 }
 

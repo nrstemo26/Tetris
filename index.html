@@ -8,8 +8,9 @@
     <title>Tetris Game</title>
 </head>
 <body>
-    <button id="stop-button" onclick="endGame()">End Game</button>
+    <div class="container">   
     <div>
+        <h1>Tetris</h1>
     <div class="grid">
         <div></div>
         <div></div>
@@ -222,54 +223,64 @@
         <div class="end"></div>
         <div class="end"></div>
     </div>
-    <h1>Next piece</h1>
-    <div class="nextPieceGrid">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
     </div>
-
 
     <div>
-        <h1>Level <span id="level">1</span></h1>
-        <h1>Score: <span id="score">0</span></h1>
-        <h4>Controls: press the arrow keys to move the tetromino and the z key to rotate the tetromino.</h4>
-    </div>
+      <div>       
+        <h1>Next piece</h1>
+        <div class="nextPieceGrid">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div> 
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div> 
+        </div>
+     </div>
 
+      <div class="score">
+        <h1>Level:<span id="level">1</span></h1>
+        <!-- <h1>Level: <span id="level">1</span></h1> -->
+        <h1>Score:<span id="score">0</span></h1>
+        <h4>Press the arrow keys to move and the z key to rotate the tetromino.</h4>
+      </div>
+    </div>
 </div>
-    <script src="app.js"></script>
+
+<script src="app.js"></script>
 </body>
 </html>
